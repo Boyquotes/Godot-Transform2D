@@ -56,16 +56,16 @@ when converted to the *parent coordinate system*.
 For those who like matrices, let us agree that vectors will generally be given as *column* matrices. In this case, `Transform2D` is represented by an <a href="https://en.wikipedia.org/wiki/Affine_transformation#Augmented_matrix">augmented matrix</a>. Local to parent coordinate conversion corresponds to
 \begin{equation\*}
   \begin{bmatrix}
-    \text{new $a$} \\\\ \text{new $b$} \\\\ 1
+    \text{new $a$} \\ \\ \text{new $b$} \\ \\ 1
   \end{bmatrix}
   =
   \begin{bmatrix}
-    e1.x & e2.x & origin.x \\\\
-    e1.y & e2.y & origin.y \\\\
+    e1.x & e2.x & origin.x \\ \\
+    e1.y & e2.y & origin.y \\ \\
     origin.x & origin.y & 1
   \end{bmatrix}
   \begin{bmatrix}
-    a \\\\ b \\\\ 1
+    a \\ \\ b \\ \\ 1
   \end{bmatrix}.
 \end{equation\*}
 
@@ -230,25 +230,25 @@ assuming `axis` is normalized and equal to $(a_1, a_2)$,
 $\vec{e_1}$ and $\vec{e_2}$ shall be processed by the matrix
 \begin{equation\*}
   \begin{bmatrix}
-    p & q \\\\
+    p & q \\ \\
     q & -p
   \end{bmatrix}
   =
   \begin{bmatrix}
-    a_2^2 - a_1^2 & -2 a_1 a_2 \\\\
+    a_2^2 - a_1^2 & -2 a_1 a_2 \\ \\
     -2 a_1 a_2 & a_1^2 - a_2^2
   \end{bmatrix}
   =
   \begin{bmatrix}
-    a_1 & -a_2 \\\\
+    a_1 & -a_2 \\ \\
     a_2 & a_1
   \end{bmatrix}
   \begin{bmatrix}
-    1 & 0 \\\\
+    1 & 0 \\ \\
     0 & -1
   \end{bmatrix}
   \begin{bmatrix}
-    a_1 & a_2 \\\\
+    a_1 & a_2 \\ \\
     -a_2 & a_1
   \end{bmatrix}.
 \end{equation\*}
@@ -345,35 +345,35 @@ there is a catch:
 
 To scale relative to the local coordinate system, all we have to do is
 \begin{align\*}
-  \vec{e_1} *= s_x \\\\
+  \vec{e_1} *= s_x \\ \\
   \vec{e_2} *= s_y.
 \end{align\*}
-To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both. For those who like matrices, all we need to do is apply $\begin{bmatrix}s_x & 0 \\\\ 0 & s_y\end{bmatrix}$ to both:
+To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both. For those who like matrices, all we need to do is apply $\begin{bmatrix}s_x & 0 \\ \\ 0 & s_y\end{bmatrix}$ to both:
 \begin{align\*}
   \begin{bmatrix}
-    \text{new $e1.x$} \\\\
+    \text{new $e1.x$} \\ \\
     \text{new $e1.y$}
   \end{bmatrix}
   &=
   \begin{bmatrix}
-    s_x & 0 \\\\
+    s_x & 0 \\ \\
     0 & s_y
   \end{bmatrix}
   \begin{bmatrix}
-    e1.x \\\\
+    e1.x \\ \\
     e1.y
-  \end{bmatrix} \\\\
+  \end{bmatrix} \\ \\
   \begin{bmatrix}
-    \text{new $e2.x$} \\\\
+    \text{new $e2.x$} \\ \\
     \text{new $e2.y$}
   \end{bmatrix}
   &=
   \begin{bmatrix}
-    s_x & 0 \\\\
+    s_x & 0 \\ \\
     0 & s_y
   \end{bmatrix}
   \begin{bmatrix}
-    e2.x \\\\
+    e2.x \\ \\
     e2.y
   \end{bmatrix}.
 \end{align\*}
