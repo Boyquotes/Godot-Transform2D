@@ -68,7 +68,7 @@ For those who like matrices, let us agree that vectors will generally be given a
     {}\\\\{}
     e1.y & e2.y & origin.y
     {}\\\\{}
-    origin.x & origin.y & 1
+    0 & 0 & 1
   \end{bmatrix}
   \begin{bmatrix}
     a
