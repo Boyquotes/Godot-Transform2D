@@ -46,30 +46,30 @@ Departing from `origin`, this represents one unit in the $y$ direction in the *p
 All vectors above are given in the *parent coordinate system*.
 
 A *local coordinate* $(a,b)$, shall yeld
-\begin{equation*}
+\begin{equation\*}
   (\text{new $a$}, \text{new $b$})
   =
   \vec{O} + a $\vec{e_1}$ + b $\vec{e_2}$
-\end{equation*}
+\end{equation\*}
 when converted to the *parent coordinate system*.
 
 For those who like matrices, let us agree that vectors will generally be given as *column* matrices. In this case, `Transform2D` is represented by an <a href="https://en.wikipedia.org/wiki/Affine_transformation#Augmented_matrix">augmented matrix</a>. Local to parent coordinate conversion corresponds to
-\begin{equation*}
-  \begin{pmatrix}
-    \text{new $a$} \\ \text{new $b$} \\ 1
-  \end{pmatrix}
+\begin{equation\*}
+  \begin{bmatrix}
+    \text{new $a$} \\\\ \text{new $b$} \\\\ 1
+  \end{bmatrix}
   =
-  \begin{pmatrix}
-    e1.x & e2.x & origin.x
-    \\
-    e1.y & e2.y & origin.y
-    \\
-    origin.x & origin.y & 1
-  \end{pmatrix}
-  \begin{pmatrix}
-    $a$ \\ $b$ \\ 1
-  \end{pmatrix}.
-\end{equation*}
+  \begin{bmatrix}
+    e1.x \& e2.x \& origin.x
+    \\\\
+    e1.y \& e2.y \& origin.y
+    \\\\
+    origin.x \& origin.y \& 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    $a$ \\\\ $b$ \\\\ 1
+  \end{bmatrix}.
+\end{equation\*}
 
 
 
@@ -94,14 +94,14 @@ Those methods place the local coordinate system inside another (parent) coordina
 
 
 ```
-  void Transform2D::set_origin(const Vector2 &position)
+  void Transform2D::set_origin(const Vector2 \&position)
   {
     origin = position;
   }
 ```
 
 ```
-  void Transform2D::translate(const Vector2 &translation)
+  void Transform2D::translate(const Vector2 \&translation)
   {
     origin += translation;
   }
@@ -119,7 +119,7 @@ Not in *local coordinates*.
 
 
 ```
-  void Transform2D::translate_local(const Vector2 &translation)
+  void Transform2D::translate_local(const Vector2 \&translation)
   {
     origin += translation.x * e1 + translation.y * e2;
   }
@@ -230,35 +230,35 @@ The `origin` is kept fixed.
 In matrix notation,
 assuming `axis` is normalized and equal to $(a_1, a_2)$,
 $\vec{e_1}$ and $\vec{e_2}$ shall be processed by the matrix
-\begin{equation*}
-  \begin{pmatrix}
-    p & q
-    \\
-    q & -p
-  \end{pmatrix}
+\begin{equation\*}
+  \begin{bmatrix}
+    p \& q
+    \\\\
+    q \& -p
+  \end{bmatrix}
   =
-  \begin{pmatrix}
-    a_2^2 - a_1^2 & -2 a_1 a_2
-    \\
-    -2 a_1 a_2 & a_1^2 - a_2^2
-  \end{pmatrix}
+  \begin{bmatrix}
+    a_2^2 - a_1^2 \& -2 a_1 a_2
+    \\\\
+    -2 a_1 a_2 \& a_1^2 - a_2^2
+  \end{bmatrix}
   =
-  \begin{pmatrix}
-    a_1 & -a_2
-    \\
-    a_2 & a_1
-  \end{pmatrix}
-  \begin{pmatrix}
-    1 & 0
-    \\
-    0 & -1
-  \end{pmatrix}
-  \begin{pmatrix}
-    a_1 & a_2
-    \\
-    -a_2 & a_1
-  \end{pmatrix}.
-\end{equation*}
+  \begin{bmatrix}
+    a_1 \& -a_2
+    \\\\
+    a_2 \& a_1
+  \end{bmatrix}
+  \begin{bmatrix}
+    1 \& 0
+    \\\\
+    0 \& -1
+  \end{bmatrix}
+  \begin{bmatrix}
+    a_1 \& a_2
+    \\\\
+    -a_2 \& a_1
+  \end{bmatrix}.
+\end{equation\*}
 This can be made more efficient if we do not normalize `axis`,
 and instead divide the result by $a_1^2 + a_2^2$.
 
@@ -351,46 +351,46 @@ there is a catch:
 > or to the *parent* $x$ direction?
 
 To scale relative to the local coordinate system, all we have to do is
-\begin{align*}
+\begin{align\*}
   \vec{e_1} *= s_x
-  \\
+  \\\\
   \vec{e_2} *= s_y.
-\end{align*}
-To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both. For those who like matrices, all we need to do is apply $\left[s_x & 0 \\ 0 & s_y\right]$ to both:
-\begin{align*}
-  \begin{pmatrix}
+\end{align\*}
+To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both. For those who like matrices, all we need to do is apply $\left[s_x \& 0 \\\\ 0 \& s_y\right]$ to both:
+\begin{align\*}
+  \begin{bmatrix}
     \text{new $e1.x$}
-    \\
+    \\\\
     \text{new $e1.y$}
-  \end{pmatrix}
-  &=
-  \begin{pmatrix}
-    s_x & 0
-    \\
-    0 & s_y
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \&=
+  \begin{bmatrix}
+    s_x \& 0
+    \\\\
+    0 \& s_y
+  \end{bmatrix}
+  \begin{bmatrix}
     e1.x
-    \\
+    \\\\
     e1.y
-  \end{pmatrix}
-  \\
+  \end{bmatrix}
+  \\\\
     \text{new $e2.x$}
-    \\
+    \\\\
     \text{new $e2.y$}
-  \end{pmatrix}
-  &=
-  \begin{pmatrix}
-    s_x & 0
-    \\
-    0 & s_y
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \&=
+  \begin{bmatrix}
+    s_x \& 0
+    \\\\
+    0 \& s_y
+  \end{bmatrix}
+  \begin{bmatrix}
     e2.x
-    \\
+    \\\\
     e2.y
-  \end{pmatrix}.
-\end{align*}
+  \end{bmatrix}.
+\end{align\*}
 But `Vector2` also has a method that can be used:
 ```
   e1 *= Vector2(sx, sy);
