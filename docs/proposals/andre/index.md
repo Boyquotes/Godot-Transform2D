@@ -91,7 +91,9 @@ but some times it is easier to use code instead of words.
 
 ## Position
 
-Those methods place the local coordinate system inside another (parent) coordinate system.
+Those methods place or move the local coordinate system inside another (parent) coordinate system.
+
+### get_origin()
 
 ```
   const Vector2 Transform2D::get_origin()
@@ -100,6 +102,7 @@ Those methods place the local coordinate system inside another (parent) coordina
   }
 ```
 
+### set_origin()
 
 ```
   void Transform2D::set_origin(const Vector2 &position)
@@ -108,12 +111,7 @@ Those methods place the local coordinate system inside another (parent) coordina
   }
 ```
 
-```
-  void Transform2D::translate(const Vector2 &translation)
-  {
-    origin += translation;
-  }
-```
+### translate()
 
 It is like if the *parent* is moving the *child* coordinate system around.
 If you throw a stone,
@@ -125,6 +123,18 @@ For that reason,
 `translation` is given in the *parent coordinate system*.
 Not in *local coordinates*.
 
+```
+  void Transform2D::translate(const Vector2 &translation)
+  {
+    origin += translation;
+  }
+```
+
+### translate_local()
+
+This is like if the object is moving **itself**, relative to its own units / size.
+Like a spaceship moving forward.
+If you double its size, the speed will be doubled as well.
 
 ```
   void Transform2D::translate_local(const Vector2 &translation)
@@ -132,10 +142,6 @@ Not in *local coordinates*.
     origin += translation.x * e1 + translation.y * e2;
   }
 ```
-
-This is like if the object is moving **itself**, relative to its own units / size.
-Like a spaceship moving forward.
-If you double its size, the speed will be doubled as well.
 
 
 ### Compatibility issue
@@ -160,6 +166,12 @@ Therefore,
 I shall write a second proposal that specifies uneven scaling if there is a demand.
 
 
+### get_scale()
+
+This function makes the assumption that there is a uniform scale.
+That is, it assumes that `e1.length() == e2.length()`.
+It makes no sense to call `get_scale()` if the scaling is uneven.
+
 ```
   real_t get_scale() const
   {
@@ -167,10 +179,12 @@ I shall write a second proposal that specifies uneven scaling if there is a dema
   }
 ```
 
-This function makes the assumption that there is a uniform scale.
-That is, it assumes that `e1.length() == e2.length()`.
-It makes no sense to call `get_scale()` if the scaling is uneven.
 
+### set_scale()
+
+Sets the size of the vectors $\vec{e_1}$ and $\vec{e_2}$.
+The *position* (*origin*) does not change:
+the object will be scaled *in place*.
 
 ```
   void set_scale(real_t s)
@@ -181,10 +195,12 @@ It makes no sense to call `get_scale()` if the scaling is uneven.
   }
 ```
 
-Sets the size of the vectors $\vec{e_1}$ and $\vec{e_2}$.
+
+### scale()
+
+Multiplies the size of the vectors $\vec{e_1}$ and $\vec{e_2}$ by $s$.
 The *position* (*origin*) does not change:
 the object will be scaled *in place*.
-
 
 ```
   void scale(real_t s)
@@ -194,9 +210,6 @@ the object will be scaled *in place*.
   }
 ```
 
-Multiplies the size of the vectors $\vec{e_1}$ and $\vec{e_2}$ by $s$.
-The *position* (*origin*) does not change:
-the object will be scaled *in place*.
 
 
 ### Compatibility issue
@@ -215,11 +228,17 @@ Size2
 
 ## Flipping
 
-This method is not really needed.
-Its specification was motivated by the fact that with *uneven scaling* on can actually call
+These methods are not really needed.
+Its specifications were motivated by the fact that with *uneven scaling* on can actually call
 `scale(Vector2(1,-1))`.
 Since we are not allowing uneven scaling in this specification,
 the *flipping* operations can be useful.
+
+
+### flip_axis()
+
+Flips (mirror) the coordinate system about the given `axis` through the `origin`.
+The `origin` is kept fixed.
 
 ```
   void flip_axis(Vector2 axis)
@@ -231,9 +250,6 @@ the *flipping* operations can be useful.
     e2 = Vector2(p * e2.x + q * e2.y, q * e2.x - p * e2.y);
   }
 ```
-
-Flips (mirror) the coordinate system about the given `axis` through the `origin`.
-The `origin` is kept fixed.
 
 In matrix notation,
 assuming `axis` is normalized and equal to $(a_1, a_2)$,
@@ -271,12 +287,7 @@ This can be made more efficient if we do not normalize `axis`,
 and instead divide the result by $a_1^2 + a_2^2$.
 
 
-```
-  void flip_direction(Vector2 direction)
-  {
-    flip_axis(Vector2(direction.y, -direction.x));
-  }
-```
+### flip_direction()
 
 Flips (mirror) the image toward the given `direction` through the `origin`.
 The `origin` is kept fixed.
@@ -284,6 +295,17 @@ The `origin` is kept fixed.
 One possible implementation is to simply rotate `direction` 90 degrees to get the rotation axis.
 And then, call `flip_axis()`.
 
+```
+  void flip_direction(Vector2 direction)
+  {
+    flip_axis(Vector2(direction.y, -direction.x));
+  }
+```
+
+
+### is_flipped()
+
+Returns true is the image is *flipped* (mirrored).
 
 ```
   bool is_flipped()
@@ -291,10 +313,6 @@ And then, call `flip_axis()`.
     return (e1.x * e2.y - e1.y * e2.x < 0);
   }
 ```
-
-Returns true is the image is *flipped* (mirrored).
-
-
 
 
 ## Setting skew
