@@ -15,4 +15,7 @@ Check the [issues and use cases every proposal should address](issues/).
 
 This is the list of proposed specs:
 
-Check the [proposals](proposals/).
+Check the [full list of proposals](proposals/).
+
+* [André's simple and user oriented proposal](proposals/andre/)
+

@@ -13,5 +13,5 @@ It is like if we **start by writing the documentation**, but taking **extra care
 
 ## List of proposals
 
-* None, yet!
+* [André's simple and user oriented proposal](andre/)
 
