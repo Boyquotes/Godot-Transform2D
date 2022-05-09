@@ -49,7 +49,7 @@ A *local coordinate* $(a,b)$, shall yeld
 \begin{equation\*}
   (\text{new $a$}, \text{new $b$})
   =
-  \vec{O} + a $\vec{e_1}$ + b $\vec{e_2}$
+  \vec{O} + a \vec{e_1} + b \vec{e_2}
 \end{equation\*}
 when converted to the *parent coordinate system*.
 
@@ -65,7 +65,7 @@ For those who like matrices, let us agree that vectors will generally be given a
     origin.x & origin.y & 1
   \end{bmatrix}
   \begin{bmatrix}
-    $a$ \\\\ $b$ \\\\ 1
+    a \\\\ b \\\\ 1
   \end{bmatrix}.
 \end{equation\*}
 
@@ -348,7 +348,7 @@ To scale relative to the local coordinate system, all we have to do is
   \vec{e_1} *= s_x \\\\
   \vec{e_2} *= s_y.
 \end{align\*}
-To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both. For those who like matrices, all we need to do is apply $\left[s_x & 0 \\\\ 0 & s_y\right]$ to both:
+To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both. For those who like matrices, all we need to do is apply $\begin{bmatrix}s_x & 0 \\\\ 0 & s_y\end{bmatrix}$ to both:
 \begin{align\*}
   \begin{bmatrix}
     \text{new $e1.x$} \\\\
