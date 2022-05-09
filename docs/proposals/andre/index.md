@@ -388,47 +388,11 @@ there is a catch:
 > or to the *parent* $x$ direction?
 
 To scale relative to the local coordinate system, all we have to do is
-\begin{align\*}
-  \vec{e_1} *= s_x
-    {}\\\\{}
-  \vec{e_2} *= s_y.
-\end{align\*}
-To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both. For those who like matrices, all we need to do is apply $\begin{bmatrix}s_x & 0 {}\\\\{} 0 & s_y\end{bmatrix}$ to both:
-\begin{align\*}
-  \begin{bmatrix}
-    \text{new $e1.x$}
-    {}\\\\{}
-    \text{new $e1.y$}
-  \end{bmatrix}
-  &=
-  \begin{bmatrix}
-    s_x & 0
-    {}\\\\{}
-    0 & s_y
-  \end{bmatrix}
-  \begin{bmatrix}
-    e1.x
-    {}\\\\{}
-    e1.y
-  \end{bmatrix}
-    {}\\\\{}
-  \begin{bmatrix}
-    \text{new $e2.x$}
-    {}\\\\{}
-    \text{new $e2.y$}
-  \end{bmatrix}
-  &=
-  \begin{bmatrix}
-    s_x & 0
-    {}\\\\{}
-    0 & s_y
-  \end{bmatrix}
-  \begin{bmatrix}
-    e2.x
-    {}\\\\{}
-    e2.y
-  \end{bmatrix}.
-\end{align\*}
+```
+  e1 *= sx;
+  e2 *= sy;
+```
+To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both.
 But `Vector2` also has a method that can be used:
 ```
   e1 *= Vector2(sx, sy);
