@@ -60,11 +60,11 @@ For those who like matrices, let us agree that vectors will generally be given a
   \end{bmatrix}
   =
   \begin{bmatrix}
-    e1.x \& e2.x \& origin.x
+    e1.x & e2.x & origin.x
     \\\\
-    e1.y \& e2.y \& origin.y
+    e1.y & e2.y & origin.y
     \\\\
-    origin.x \& origin.y \& 1
+    origin.x & origin.y & 1
   \end{bmatrix}
   \begin{bmatrix}
     $a$ \\\\ $b$ \\\\ 1
@@ -94,14 +94,14 @@ Those methods place the local coordinate system inside another (parent) coordina
 
 
 ```
-  void Transform2D::set_origin(const Vector2 \&position)
+  void Transform2D::set_origin(const Vector2 &position)
   {
     origin = position;
   }
 ```
 
 ```
-  void Transform2D::translate(const Vector2 \&translation)
+  void Transform2D::translate(const Vector2 &translation)
   {
     origin += translation;
   }
@@ -119,7 +119,7 @@ Not in *local coordinates*.
 
 
 ```
-  void Transform2D::translate_local(const Vector2 \&translation)
+  void Transform2D::translate_local(const Vector2 &translation)
   {
     origin += translation.x * e1 + translation.y * e2;
   }
@@ -232,31 +232,31 @@ assuming `axis` is normalized and equal to $(a_1, a_2)$,
 $\vec{e_1}$ and $\vec{e_2}$ shall be processed by the matrix
 \begin{equation\*}
   \begin{bmatrix}
-    p \& q
+    p & q
     \\\\
-    q \& -p
+    q & -p
   \end{bmatrix}
   =
   \begin{bmatrix}
-    a_2^2 - a_1^2 \& -2 a_1 a_2
+    a_2^2 - a_1^2 & -2 a_1 a_2
     \\\\
-    -2 a_1 a_2 \& a_1^2 - a_2^2
+    -2 a_1 a_2 & a_1^2 - a_2^2
   \end{bmatrix}
   =
   \begin{bmatrix}
-    a_1 \& -a_2
+    a_1 & -a_2
     \\\\
-    a_2 \& a_1
+    a_2 & a_1
   \end{bmatrix}
   \begin{bmatrix}
-    1 \& 0
+    1 & 0
     \\\\
-    0 \& -1
+    0 & -1
   \end{bmatrix}
   \begin{bmatrix}
-    a_1 \& a_2
+    a_1 & a_2
     \\\\
-    -a_2 \& a_1
+    -a_2 & a_1
   \end{bmatrix}.
 \end{equation\*}
 This can be made more efficient if we do not normalize `axis`,
@@ -356,18 +356,18 @@ To scale relative to the local coordinate system, all we have to do is
   \\\\
   \vec{e_2} *= s_y.
 \end{align\*}
-To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both. For those who like matrices, all we need to do is apply $\left[s_x \& 0 \\\\ 0 \& s_y\right]$ to both:
+To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both. For those who like matrices, all we need to do is apply $\left[s_x & 0 \\\\ 0 & s_y\right]$ to both:
 \begin{align\*}
   \begin{bmatrix}
     \text{new $e1.x$}
     \\\\
     \text{new $e1.y$}
   \end{bmatrix}
-  \&=
+  &=
   \begin{bmatrix}
-    s_x \& 0
+    s_x & 0
     \\\\
-    0 \& s_y
+    0 & s_y
   \end{bmatrix}
   \begin{bmatrix}
     e1.x
@@ -379,11 +379,11 @@ To scale relative to the parent coordinate system, we need to scale the $x$ coor
     \\\\
     \text{new $e2.y$}
   \end{bmatrix}
-  \&=
+  &=
   \begin{bmatrix}
-    s_x \& 0
+    s_x & 0
     \\\\
-    0 \& s_y
+    0 & s_y
   \end{bmatrix}
   \begin{bmatrix}
     e2.x
