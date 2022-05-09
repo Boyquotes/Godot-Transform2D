@@ -36,13 +36,13 @@ Although we might think of *node* positioning, the `Transform2D` is not aware of
 When we instantiate a `Transform2D` object, we assume there is some *parent coordinate system*.
 
 Therefore, an instance of `Transform2D` is, from the public interface point of view, as a set of three variables. We will give them name in this document, but this does not mean that `Transform2D` needs to be implemented internally using those names.
-1. The `origin` (Vector2 origin - $\vec{O}$).
+1. The `origin` (Vector2 origin --- $\vec{o}$).
 This is where the coordinate $(0,0)$ is mapped to in the *parent coordinate system*.
 From the *regular user*'s point of view, it is `position`.
 From the *megazord user*'s point of view, it is `origin`.
-2. The `x-axis` (Vector2 e1 - $\vec{e_1}$).
+2. The `x-axis` (Vector2 b1 --- $\vec{b_1}$).
 Departing from `origin`, this represents one unit in the $x$ direction in the *parent coordinate system*.
-3. The `y-axis` (Vector2 e2 - $\vec{e_2}$).
+3. The `y-axis` (Vector2 b2 --- $\vec{b_2}$).
 Departing from `origin`, this represents one unit in the $y$ direction in the *parent coordinate system*.
 
 All vectors above are given in the *parent coordinate system*.
@@ -51,7 +51,7 @@ A *local coordinate* $(a,b)$, shall yeld
 \begin{equation\*}
   (\text{new $a$}, \text{new $b$})
   =
-  \vec{O} + a \vec{e_1} + b \vec{e_2}
+  \vec{o} + a \vec{b_1} + b \vec{b_2}
 \end{equation\*}
 when converted to the *parent coordinate system*.
 
@@ -66,9 +66,9 @@ For those who like matrices, let us agree that vectors will generally be given a
   \end{bmatrix}
   =
   \begin{bmatrix}
-    e1.x & e2.x & origin.x
+    b1.x & b2.x & origin.x
     {}\\\\{}
-    e1.y & e2.y & origin.y
+    b1.y & b2.y & origin.y
     {}\\\\{}
     0 & 0 & 1
   \end{bmatrix}
@@ -143,7 +143,7 @@ If you double its size, the speed will be doubled as well.
 ```
   void Transform2D::translate_local(const Vector2 &translation)
   {
-    origin += translation.x * e1 + translation.y * e2;
+    origin += translation.x * b1 + translation.y * b2;
   }
 ```
 
@@ -161,7 +161,7 @@ Scaling
 The current scaling implementation is, IMO, a little messy.
 
 I really think there is not much use for uneven scaling (different scale for $x$ and $y$).
-Uneven scaling can be achieved by directly manipulating $\vec{e_1}$ and $\vec{e_2}$.
+Uneven scaling can be achieved by directly manipulating $\vec{b_1}$ and $\vec{b_2}$.
 
 Here is an ideal world.
 But it is important to notice that the real world is not ideal,
@@ -174,28 +174,28 @@ I shall write a second proposal that specifies uneven scaling if there is a dema
 ### get_scale()
 
 This function makes the assumption that there is a uniform scale.
-That is, it assumes that `e1.length() == e2.length()`.
+That is, it assumes that `b1.length() == b2.length()`.
 It makes no sense to call `get_scale()` if the scaling is uneven.
 
 ```
   real_t get_scale() const
   {
-    return e1.length();
+    return b1.length();
   }
 ```
 
 
 ### set_scale()
 
-Sets the size of the vectors $\vec{e_1}$ and $\vec{e_2}$.
+Sets the size of the vectors $\vec{b_1}$ and $\vec{b_2}$.
 The *position* (*origin*) does not change:
 the object will be scaled *in place*.
 
 ```
   void set_scale(real_t s)
   {
-    e1.normalize();
-    e2.normalize();
+    b1.normalize();
+    b2.normalize();
     scale(s);
   }
 ```
@@ -203,15 +203,15 @@ the object will be scaled *in place*.
 
 ### scale()
 
-Multiplies the size of the vectors $\vec{e_1}$ and $\vec{e_2}$ by $s$.
+Multiplies the size of the vectors $\vec{b_1}$ and $\vec{b_2}$ by $s$.
 The *position* (*origin*) does not change:
 the object will be scaled *in place*.
 
 ```
   void scale(real_t s)
   {
-    e1*= scale;
-    e2*= scale;
+    b1*= scale;
+    b2*= scale;
   }
 ```
 
@@ -222,7 +222,7 @@ the object will be scaled *in place*.
 
 Current implementation is messy.
 
-Size2
+Sizb2
 
 
 ### What scaling is NOT
@@ -253,14 +253,14 @@ The `origin` is kept fixed.
     real_t len2 = axis.x * axis.x + axis.y * axis.y;
     real_t p = (axis.y * axis.y - axis.x * axis.x) / len2;
     real_t q = -2 * axis.x * axis.y / len2;
-    e1 = Vector2(p * e1.x + q * e1.y, q * e1.x - p * e1.y);
-    e2 = Vector2(p * e2.x + q * e2.y, q * e2.x - p * e2.y);
+    b1 = Vector2(p * b1.x + q * b1.y, q * b1.x - p * b1.y);
+    b2 = Vector2(p * b2.x + q * b2.y, q * b2.x - p * b2.y);
   }
 ```
 
 In matrix notation,
 assuming `axis` is normalized and equal to $(a_1, a_2)$,
-$\vec{e_1}$ and $\vec{e_2}$ shall be processed by the matrix
+$\vec{b_1}$ and $\vec{b_2}$ shall be processed by the matrix
 \begin{equation\*}
   \begin{bmatrix}
     p & q
@@ -317,7 +317,7 @@ Returns true is the image is *flipped* (mirrored).
 ```
   bool is_flipped()
   {
-    return (e1.x * e2.y - e1.y * e2.x < 0);
+    return (b1.x * b2.y - b1.y * b2.x < 0);
   }
 ```
 
@@ -353,7 +353,7 @@ That is,
 scaling is done about the parent's `origin`.
 This is **not consistent** with `Node2D` behaviour.
 Of course,
-it would make more sense if `Translate2D::set_scale()`
+it would make more sense if `Translatb2D::set_scale()`
 was consistent with `Node2D::set_scale()`.
 
 Also,
@@ -389,14 +389,14 @@ there is a catch:
 
 To scale relative to the local coordinate system, all we have to do is
 ```
-  e1 *= sx;
-  e2 *= sy;
+  b1 *= sx;
+  b2 *= sy;
 ```
-To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{e_1}$ and $\vec{e_2}$, and also the $y$ coordinate of both.
+To scale relative to the parent coordinate system, we need to scale the $x$ coordinate of $\vec{b_1}$ and $\vec{b_2}$, and also the $y$ coordinate of both.
 But `Vector2` also has a method that can be used:
 ```
-  e1 *= Vector2(sx, sy);
-  e2 *= Vector2(sx, sy);
+  b1 *= Vector2(sx, sy);
+  b2 *= Vector2(sx, sy);
 ```
 
 
