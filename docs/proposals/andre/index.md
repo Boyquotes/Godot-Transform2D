@@ -1,4 +1,5 @@
-# André's proposal
+André's proposal
+===
 
 I imagine two kinds of `Transform2D` users:
 1. Regular users.
@@ -13,7 +14,8 @@ Although *regular users* usually manipulate `Node2D` and not `Transform2D` direc
 this proposal aims to keep methods of `Node2D` consistent with those of `Transform2D`.
 
 
-## What `Transform2D` is
+What `Transform2D` is
+---
 
 Things in Godot are positioned according to coordinates.
 We can imagine that the whole *world* has a **global** system of coordinates.
@@ -81,7 +83,8 @@ For those who like matrices, let us agree that vectors will generally be given a
 
 
 
-# Public methods
+Public methods
+===
 
 **Attention:**
 This does not tell how each method shall be implemented internally.
@@ -89,7 +92,8 @@ The idea is to simply describe the method behaviour...
 but some times it is easier to use code instead of words.
 
 
-## Position
+Position
+---
 
 Those methods place or move the local coordinate system inside another (parent) coordinate system.
 
@@ -151,7 +155,8 @@ There is no method for **moving things** around.
 Current's implementation `translate` is what we call `translate_local`.
 
 
-## Scaling
+Scaling
+---
 
 The current scaling implementation is, IMO, a little messy.
 
@@ -224,9 +229,11 @@ Size2
 
 
 
-## Rotating
+Rotating
+---
 
-## Flipping
+Flipping
+---
 
 These methods are not really needed.
 Its specifications were motivated by the fact that with *uneven scaling* on can actually call
@@ -315,14 +322,17 @@ Returns true is the image is *flipped* (mirrored).
 ```
 
 
-## Setting skew
+Setting skew
+---
 
-## Set axis
+Set axis
+---
 
+Discussion
+===
 
-# Discussion
-
-## Scaling about what point?
+Scaling about what point?
+---
 
 In its simplest form,
 *scaling* is just making the thing bigger or smaller.
@@ -365,7 +375,8 @@ The programmer wants to rescale only those child nodes in this group, not the ot
 The **correct** approach here would be to create a node `G`, put this special group of child nodes of `A` inside `G`, instead. And then, and place `G` in `A`. Now, instead of rescaling every child node and their `origin`, one should simply rescale `G`.
 
 
-## Uneven scaling :-(
+Uneven scaling :-(
+---
 
 In current implementation, scaling is a little more complicated then here,
 because it allows one to apply a different scale to the $x$ and $y$ directions.
