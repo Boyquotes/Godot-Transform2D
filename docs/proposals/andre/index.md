@@ -1,10 +1,13 @@
 André's proposal
 ===
 
+* auto-gen TOC:
+{:toc}
+
 I imagine two kinds of `Transform2D` users:
-1. Regular users.
+1. **Regular users.**
 Users that just want to place and manipulate an object in some (parent) coordinate system.
-2. Megazord matrix lovers power users.
+2. **Megazord matrix lovers power users.**
 People that want to rotate things inside things that rotate and move around.
 
 This proposal aims to be easy and intuitive for regular users,
@@ -49,7 +52,7 @@ All vectors above are given in the *parent coordinate system*.
 
 A *local coordinate* $(a,b)$, shall yeld
 \begin{equation\*}
-  (\text{new $a$}, \text{new $b$})
+  (a_{\text{new}}, b_{\text{new}})
   =
   \vec{o} + a \vec{b_1} + b \vec{b_2}
 \end{equation\*}
@@ -58,9 +61,9 @@ when converted to the *parent coordinate system*.
 For those who like matrices, let us agree that vectors will generally be given as *column* matrices. In this case, `Transform2D` is represented by an <a href="https://en.wikipedia.org/wiki/Affine_transformation#Augmented_matrix">augmented matrix</a>. Local to parent coordinate conversion corresponds to
 \begin{equation\*}
   \begin{bmatrix}
-    \text{new $a$}
+    a_{\text{new}}
     {}\\\\{}
-    \text{new $b$}
+    b_{\text{new}}
     {}\\\\{}
     1
   \end{bmatrix}
@@ -81,6 +84,41 @@ For those who like matrices, let us agree that vectors will generally be given a
   \end{bmatrix}.
 \end{equation\*}
 
+In this document,
+let us agree to use the symbols $T$ and $B$ to represent the following matrices
+\begin{equation\*}
+  T
+  =
+  \begin{bmatrix}
+    b1.x & b2.x & origin.x
+    {}\\\\{}
+    b1.y & b2.y & origin.y
+    {}\\\\{}
+    0 & 0 & 1
+  \end{bmatrix}
+  \quad\text{e}\quad
+  B
+  =
+  \begin{bmatrix}
+    b1.x & b2.x
+    {}\\\\{}
+    b1.y & b2.y
+  \end{bmatrix}
+\end{equation\*}
+
+### Chaining transforms
+
+When we have two `Transform2D`s, $T_1$ and $T_2$,
+they can be chained and form a new `Transform2D` $T$.
+To be precise, applying $T$ to some `Vector2D` $\vec{v}$
+is the same as applying $T_1$ to $\vec{v}$ and then applying $T_2$ to the result.
+In terms of matrix notation,
+\begin{equation\*}
+  T = T_2 * T_1.
+\end{equation\*}
+However,
+**it does not mean** that *matrix multiplication* is always a good / adequate way
+to manipulate of a `Transform2D` instance.
 
 
 Public methods
@@ -159,8 +197,7 @@ Scaling
 ---
 
 The current scaling implementation is, IMO, a little messy.
-
-I really think there is not much use for uneven scaling (different scale for $x$ and $y$).
+I really think there is **not much use** for uneven scaling (different scale for $x$ and $y$).
 Uneven scaling can be achieved by directly manipulating $\vec{b_1}$ and $\vec{b_2}$.
 
 Here is an ideal world.
@@ -219,10 +256,72 @@ the object will be scaled *in place*.
 
 ### Compatibility issue
 
+#### Uneven scaling
 
-Current implementation is messy.
+The current implementation allows uneven scaling.
+That is,
+it allows a different scaling on the $x$ and $y$ directions.
+The implementation is not consistent, however,
+because sometimes $x$ and $y$ directions refers to the local $x$ and $y$ directions,
+and some times it refers to the parents $x$ and $y$ directions.
 
-Sizb2
+For example,
+the methods `Transform2D::set_rotation_and_scale`
+and `Transform2D::set_rotation_scale_and_skew`
+assume that the $x$ and $y$ directions are the local versions.
+For that reason they execute code like
+```
+  columns[0][0] = Math::cos(p_rot) * p_scale.x;
+  columns[0][1] = Math::sin(p_rot) * p_scale.x;
+```
+The same is true of `Transform2D::set_scale`, as it does
+```
+  columns[0] *= p_scale.x;
+```
+However, `Transform2D::scale` calls `Transform2D::scale_basis`, that does
+```
+  columns[0][0] *= p_scale.x;
+  columns[0][1] *= p_scale.y;
+```
+
+In this document we suggest that the methods `set_scale` and `scale`
+simply do not take two parameters.
+And `get_scale` returns only one real number.
+
+In the long term,
+we suggest that `Node2D` use
+`Translate2D::set_rotation`,
+`Translate2D::rotate`,
+`Translate2D::set_scale`,
+`Translate2D::scale`,
+`Translate2D::translate`,
+etc
+instead of calling
+`Transform2D::set_rotation_and_scale`
+and `Transform2D::set_rotation_scale_and_skew`
+through `Transform2D::_update_transform`.
+Notice that `Node2D::rotate` does
+```
+  set_rotation(get_rotation() + p_radians);
+```
+while it would be much more efficient to call
+```
+  transform.rotate(p_radians);
+```
+
+
+#### Scaling does not change `origin`
+
+The current implementation is not very consistent.
+Sometimes it assumes scaling is done about the `origin`,
+and some times it assumes it is done about the parents `origin`.
+That is,
+sometimes it rescales `origin`, and some times it does not.
+
+In this proposal,
+we completely abolish scaling that is not about the local `origin`.
+That is,
+no proposed scaling method changes `origin`.
 
 
 ### What scaling is NOT
@@ -231,6 +330,114 @@ Sizb2
 
 Rotating
 ---
+
+### rotate
+
+This method rotates the `axis` $\vec{b_1}$ and $\vec{b_2}$ about the `origin`.
+It does not touch the `origin`.
+
+```
+  void Transform2D::rotate(const real_t radians)
+  {
+    real_t cs = Math:cos(radians);
+    real_t sn = Math:sin(radians);
+    b1 = Vector2(b1.x * cs - b1.y * sn, b1.x * sn + b1.y * cs);
+    b2 = Vector2(b2.x * cs - b2.y * sn, b2.x * sn + b2.y * cs);
+  }
+```
+
+In matrix notation,
+\begin{equation\*}
+  \begin{bmatrix}
+    b_j.x_{\text{new}}
+    {}\\\\{}
+    b_j.y_{\text{new}}
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    \cos(\theta) & -\sin(\theta)
+    {}\\\\{}
+    \sin(\theta) & \cos(\theta)
+  \end{bmatrix}
+  \begin{bmatrix}
+    b_j.x
+    {}\\\\{}
+    b_j.y
+  \end{bmatrix}
+\end{equation\*}
+
+
+### get_rotation
+
+Returns the angle in radians from the parent's $x$-axis to $\vec{b_1}$.
+
+
+### set_rotation
+
+Rotates $\vec{b_1}$ and $\vec{b_2}$ the exact amount so that the angle
+from the parent $x$-axis to $\vec{b_1}$ is the given `radians`.
+
+The implementation can simply rotate backwards to get an angle of $0$,
+and then call rotate.
+
+```
+  void Transform2D::set_rotation(const real_t radians)
+  {
+    real_t len = b1.length();
+    real_t cs = b1.x / len;
+    real_t sn = -b1.y / len;
+    b1 = Vector2(b1.x * cs - b1.y * sn, b1.x * sn + b1.y * cs);
+    b2 = Vector2(b2.x * cs - b2.y * sn, b2.x * sn + b2.y * cs);
+    rotate(radians);
+  }
+```
+In matrix notation,
+\begin{equation\*}
+  \begin{bmatrix}
+    b_j.x_{\text{new}}
+    {}\\\\{}
+    b_j.y_{\text{new}}
+  \end{bmatrix}
+  =
+  \frac{1}{\sqrt{\vec{b_1}.x^2 + \vec{b_1}.y^2}}
+  \begin{bmatrix}
+    \cos(\theta) & -\sin(\theta)
+    {}\\\\{}
+    \sin(\theta) & \cos(\theta)
+  \end{bmatrix}
+  \begin{bmatrix}
+    \vec{b_1}.x & \vec{b_1}.y
+    {}\\\\{}
+    -\vec{b_1}.y & \vec{b_1}.x
+  \end{bmatrix}
+  \begin{bmatrix}
+    b_j.x
+    {}\\\\{}
+    b_j.y
+  \end{bmatrix}
+\end{equation\*}
+Therefore,
+a more efficient implementation would use a precalculated matrix product formula,
+instead of calling `rotate()`.
+
+Notice that `set_rotation()` is much more complicated then `rotation()`.
+The current implementation is not only more complicate.
+It is also **buggy**!!!
+In the current implementation,
+`set_rotation()` **always** returns orthogonal axis!!!
+
+
+Also, notice that `Node2D::rotate` does
+```
+  set_rotation(get_rotation() + p_radians);
+```
+while it would be much more efficient to call
+```
+  transform.rotate(p_radians);
+```
+The `Node2D` implementation is an indicative that
+`Translate2D` is poorly designed / specified.
+
 
 Flipping
 ---
