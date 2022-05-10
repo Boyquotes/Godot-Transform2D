@@ -1,3 +1,10 @@
+---
+title: Transform2D Proposals
+---
+
+* auto-gen TOC:
+{:toc}
+
 # `Transform2D` public interface specification
 
 The purpose of this project is to **fully** specify the public interface

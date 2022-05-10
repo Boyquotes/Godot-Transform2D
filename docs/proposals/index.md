@@ -1,3 +1,10 @@
+---
+title: Proposals List
+---
+
+* auto-gen TOC:
+{:toc}
+
 # Godot's `Transform2D` public interface proposals
 
 Each proposal needs to be **very precise**

@@ -1,5 +1,5 @@
 ---
-title: André's proposal
+title: André's Proposal
 ---
 
 * auto-gen TOC:

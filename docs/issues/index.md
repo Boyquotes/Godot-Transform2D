@@ -1,3 +1,10 @@
+---
+title: Issues and Use-Cases
+---
+
+* auto-gen TOC:
+{:toc}
+
 # Issues that should be addressed
 
 One shall not impose how some problem needs to be solved.
