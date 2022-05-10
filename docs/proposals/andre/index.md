@@ -1,5 +1,6 @@
-André's proposal
-===
+---
+title: André's proposal
+---
 
 * auto-gen TOC:
 {:toc}
@@ -18,7 +19,7 @@ this proposal aims to keep methods of `Node2D` consistent with those of `Transfo
 
 
 What `Transform2D` is
----
+===
 
 Things in Godot are positioned according to coordinates.
 We can imagine that the whole *world* has a **global** system of coordinates.
@@ -106,7 +107,8 @@ let us agree to use the symbols $T$ and $B$ to represent the following matrices
   \end{bmatrix}
 \end{equation\*}
 
-### Chaining transforms
+Chaining transforms
+---
 
 When we have two `Transform2D`s, $T_1$ and $T_2$,
 they can be chained and form a new `Transform2D` $T$.
