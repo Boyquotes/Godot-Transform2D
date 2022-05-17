@@ -8,7 +8,7 @@ title: André's Proposal
 I imagine two kinds of `Transform2D` users:
 1. **Regular users.**
 Users that just want to place and manipulate an object in some (parent) coordinate system.
-2. **Megazord matrix lovers power users.**
+2. **Megazord matrix lover power users.**
 People that want to rotate things inside things that rotate and move around.
 
 This proposal aims to be easy and intuitive for regular users,
@@ -18,7 +18,7 @@ Although *regular users* usually manipulate `Node2D` and not `Transform2D` direc
 this proposal aims to keep methods of `Node2D` consistent with those of `Transform2D`.
 
 
-What `Transform2D` is
+What Transform2D is
 ===
 
 Things in Godot are positioned according to coordinates.
@@ -97,20 +97,22 @@ let us agree to use the symbols $T$ and $B$ to represent the following matrices
     {}\\\\{}
     0 & 0 & 1
   \end{bmatrix}
-  \quad\text{e}\quad
+  \quad\text{and}\quad
   B
   =
   \begin{bmatrix}
     b1.x & b2.x
     {}\\\\{}
     b1.y & b2.y
-  \end{bmatrix}
+  \end{bmatrix}.
 \end{equation\*}
+If we have many `Transform2D` objects, we shall use $T_1, B_1, T_2, B_2$, etc.
+
 
 Chaining transforms
 ---
 
-When we have two `Transform2D`s, $T_1$ and $T_2$,
+When we have two `Transform2D`s $T_1$ and $T_2$,
 they can be chained and form a new `Transform2D` $T$.
 To be precise, applying $T$ to some `Vector2D` $\vec{v}$
 is the same as applying $T_1$ to $\vec{v}$ and then applying $T_2$ to the result.
@@ -120,16 +122,110 @@ In terms of matrix notation,
 \end{equation\*}
 However,
 **it does not mean** that *matrix multiplication* is always a good / adequate way
-to manipulate of a `Transform2D` instance.
+to manipulate a `Transform2D` instance.
+In special,
+the last line of $T$ is not really useful.
+It's sole purpose is to allow the chaining of transforms
+to be represented by matrix multiplication.
+
+
+Distance, speed, etc.
+---
+
+When we are measuring distances or speed,
+the position of `origin` is irrelevant.
+When converting speed $\vec{v} = (v_1, v_2)$ to the parent's coordinate system,
+we have
+\begin{equation\*}
+  \vec{v}_{\text{new}}
+  =
+  v_1 \vec{b_1} + v_2 \vec{b_2}.
+\end{equation\*}
+I don't really understand why people want that much to talk about matrices,
+but in terms of matrices,
+\begin{equation\*}
+  \begin{bmatrix}
+    {v_1}_{\text{new}}
+    {}\\\\{}
+    {v_2}_{\text{new}}
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    b1.x & b2.x
+    {}\\\\{}
+    b1.y & b2.y
+  \end{bmatrix}
+  \begin{bmatrix}
+    v_1
+    {}\\\\{}
+    v_2
+  \end{bmatrix}
+\end{equation\*}
 
 
 Public methods
 ===
 
 **Attention:**
-This does not tell how each method shall be implemented internally.
-The idea is to simply describe the method behaviour...
+We do not intend to impose how each method shall be implemented internally.
+The idea is to simply describe each method's behaviour...
 but some times it is easier to use code instead of words.
+
+Methods can be divided into the following categories:
+<ol>
+  <li>Constructors.</li>
+  <li>Apply `Transform2D` to a `Vector2`.</li>
+  <li>Compose (chain) two `Transform2D` instances.</li>
+  <li>Manipulate a single `Transform2D` instance.</li>
+</ol>
+
+
+Constructors
+---
+
+### Transform2D()
+
+IMHO, excessive polymorphism is a bit ugly.
+But changing things is not worthy.
+So,
+constructors can be kept the way they are right now.
+
+Although,
+`Transform2D::Transform2D()` does not initialize
+`origin`, `columns[0][1]` and `columns[1][0]`.
+When I was young, this was considered a bug...
+now, I don't know.
+
+
+Apply the transform
+---
+
+### xform()
+
+Apply `Transform2D` to the given vector
+and returns the resulting `Vector2`.
+
+```
+Vector2 Transform2D::xform(const Vector2 &p_vec) const
+{
+  return p_vec.x * b1 + p_vec.y * b2 + origin;
+}
+```
+
+### xform_basis()
+
+Apply `Transform2D` to "tangent vectors"
+and returns the resulting `Vector2`.
+That is,
+to vectors that are independent of `origin`:
+distance, speed, acceleration, direction, etc.
+
+```
+Vector2 Transform2D::xform_basis(const Vector2 &p_vec) const
+{
+  return p_vec.x * b1 + p_vec.y * b2;
+}
+```
 
 
 Position
@@ -199,15 +295,16 @@ Scaling
 ---
 
 The current scaling implementation is, IMO, a little messy.
-I really think there is **not much use** for uneven scaling (different scale for $x$ and $y$).
-Uneven scaling can be achieved by directly manipulating $\vec{b_1}$ and $\vec{b_2}$.
+I really think that for a regular user,
+there is **no much use** for uneven scaling (different scale for $x$ and $y$).
+For the *Megazord* user,
+uneven scaling can be achieved by directly manipulating $\vec{b_1}$ and $\vec{b_2}$.
 
-Here is an ideal world.
 But it is important to notice that the real world is not ideal,
 and `Node2D` makes use of the uneven version of *scaling*
 (although not through the methods described here).
 Therefore,
-I shall write a second proposal that specifies uneven scaling if there is a demand.
+I shall write a second proposal that specifies uneven scaling if there is demand for it.
 
 
 ### get_scale()
@@ -333,7 +430,7 @@ no proposed scaling method changes `origin`.
 Rotating
 ---
 
-### rotate
+### rotate()
 
 This method rotates the `axis` $\vec{b_1}$ and $\vec{b_2}$ about the `origin`.
 It does not touch the `origin`.
@@ -369,12 +466,12 @@ In matrix notation,
 \end{equation\*}
 
 
-### get_rotation
+### get_rotation()
 
 Returns the angle in radians from the parent's $x$-axis to $\vec{b_1}$.
 
 
-### set_rotation
+### set_rotation()
 
 Rotates $\vec{b_1}$ and $\vec{b_2}$ the exact amount so that the angle
 from the parent $x$-axis to $\vec{b_1}$ is the given `radians`.
@@ -401,7 +498,7 @@ In matrix notation,
     b_j.y_{\text{new}}
   \end{bmatrix}
   =
-  \frac{1}{\sqrt{\vec{b_1}.x^2 + \vec{b_1}.y^2}}
+  \frac{1}{\sqrt{\left(\vec{b_1}.x\right)^2 + \left(\vec{b_1}.y\right)^2}}
   \begin{bmatrix}
     \cos(\theta) & -\sin(\theta)
     {}\\\\{}
@@ -534,8 +631,24 @@ Returns true is the image is *flipped* (mirrored).
 Setting skew
 ---
 
-Set axis
+Usually, $\vec{b_1}$ and $\vec{b_2}$ are orthogonal.
+The *skew* is a measure of how much the angle between those two vectors
+deviate from being orthogonal.
+The angle from $\vec{b_1}$ to $\vec{b_2}$ is given by
+\begin{equation\*}
+  \frac{\pi}{2} + \mathrm{skew}.
+\end{equation\*}
+
+### set_skew()
+
+### get_skew()
+
+
+Setting the axis
 ---
+
+### set_axis()
+
 
 Discussion
 ===
