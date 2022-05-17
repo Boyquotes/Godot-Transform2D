@@ -137,7 +137,7 @@ the position of `origin` is irrelevant.
 When converting speed $\vec{v} = (v_1, v_2)$ to the parent's coordinate system,
 we have
 \begin{equation\*}
-  \vec{v}_{\text{new}}
+  \vec{v}\_{\text{new}}
   =
   v_1 \vec{b_1} + v_2 \vec{b_2}.
 \end{equation\*}
@@ -145,9 +145,9 @@ I don't really understand why people want that much to talk about matrices,
 but in terms of matrices,
 \begin{equation\*}
   \begin{bmatrix}
-    {v_1}_{\text{new}}
+    {v_1}\_{\text{new}}
     {}\\\\{}
-    {v_2}_{\text{new}}
+    {v_2}\_{\text{new}}
   \end{bmatrix}
   =
   \begin{bmatrix}
